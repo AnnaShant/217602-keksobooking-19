@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Анна Тишачкина](https://up.htmlacademy.ru/javascript/19/user/217602).
-* Наставник: `Неизвестно`.
+* Наставник: `Без наставника`.
 
 ---
 
