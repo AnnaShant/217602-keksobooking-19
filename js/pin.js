@@ -25,10 +25,13 @@
     renderAd: function () {
       var fragment = document.createDocumentFragment();
       window.card();
-      for (var j = 0; j < window.AMOUNT_QUARTERS; j++) {
-        fragment.appendChild(createElementPin(j));
-      }
-      mapPinsElement.appendChild(fragment);
+      var onLoad = function (advertisments) {
+        advertisments.forEach(function (pin) {
+          fragment.appendChild(createElementPin(pin));
+        });
+        mapPinsElement.appendChild(fragment);
+      };
+      window.backend.load(onLoad);
     }
   };
 })();

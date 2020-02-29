@@ -72,4 +72,33 @@
 
   mapElement.addEventListener('mousedown', onActiveClick);
   mapElement.addEventListener('keydown', onActivePress);
+
+  // Отправка данных формы
+  var formSend = function () {
+    mapElement.classList.add('hidden');
+  };
+
+  var errorHandler = function (errorMessage) {
+    var similarErrorTemplate = document.querySelector('#error')
+    .content
+    .querySelector('.error');
+
+    var node = similarErrorTemplate.cloneNode(true);
+
+    node.querySelector('.error__message').textContent = errorMessage;
+
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  var showError = function (errorMessage) {
+    errorHandler(errorMessage);
+  };
+
+  var onFormSubmit = function (evt) {
+    evt.preventDefault();
+
+    window.backend.save(new FormData(mainForm), formSend, showError);
+  };
+
+  mainForm.addEventListener('submit', onFormSubmit);
 })();
