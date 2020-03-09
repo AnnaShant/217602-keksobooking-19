@@ -2,15 +2,26 @@
 
 (function () {
   window.data = {
-    // Функция рандомного числа
-    getRandomInt: function (max) {
-      return Math.floor(Math.random() * max);
+    // Функция случайного элемента
+    getRandomElement: function (arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
     },
 
-    // Функция рандомного расположения метки
-    getRandomLocation: function (min, max) {
-      var rand = min + Math.random() * (max + 1 - min);
-      return Math.floor(rand);
+    // Функция случайного числа
+    getRandomInt: function (min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+
+    // Массив создания случайных элементов
+    getRandomArr: function (arr) {
+      var length = window.data.getRandomInt(1, arr.length);
+      var resultedArr = [];
+
+      for (var j = 0; j < length; j++) {
+        resultedArr.push(window.data.getRandomElement(arr));
+      }
+
+      return resultedArr;
     }
   };
 })();
