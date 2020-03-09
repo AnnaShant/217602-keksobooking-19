@@ -22,27 +22,28 @@
   window.form = {
   // Добавление/удаление атрибута disabled
     setDisabledAdd: function () {
-      for (var d = 0; d < fieldsetForm.length; d++) {
-        fieldsetForm[d].disabled = true;
+      for (var i = 0; i < fieldsetForm.length; i++) {
+        fieldsetForm[i].disabled = true;
       }
     },
 
     setDisabledRemove: function () {
-      for (var r = 0; r < fieldsetForm.length; r++) {
-        fieldsetForm[r].removeAttribute('disabled');
+      for (var j = 0; j < fieldsetForm.length; j++) {
+        fieldsetForm[j].removeAttribute('disabled');
       }
     },
 
     // Открытие/закрытие попапа
     getPopupOpen: function () {
-      window.pin.getAddress();
-      window.map.classList.remove('map--faded');
+      window.map.mapAds.classList.remove('map--faded');
       mainForm.classList.remove('ad-form--disabled');
       window.form.setDisabledRemove();
     }
   };
 
   window.form.setDisabledAdd();
+
+  window.map.getAddress();
 
   // Все элементы option
   var inputCapacityOptions = capacitySelect.querySelectorAll('option');
