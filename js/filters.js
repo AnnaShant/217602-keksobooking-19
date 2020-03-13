@@ -1,130 +1,109 @@
 'use strict';
+
 (function () {
-  var housingType = document.querySelector('#housing-type');
-  var housingPrice = document.querySelector('#housing-price');
-  var housingRooms = document.querySelector('#housing-rooms');
-  var housingGuests = document.querySelector('#housing-guests');
-  var housingFeatures = document.querySelectorAll('#housing-features input');
-  var mapCard = document.querySelector('.map__card');
-  var filterType = function (data) {
-    var filterData = [];
-    data.forEach(function (item) {
-      if (housingType.value === item.offer.type) {
-        filterData.push(item);
-      } else if (housingType.value === 'any') {
-        filterData.push(item);
-      }
-    });
-    return filterData;
-  };
-  var filterPrice = function (data) {
-    var filterData = [];
-    var prices = [{
-      name: 'middle',
-      max: 50000,
-      min: 10000
-    },
-    {
-      name: 'low',
-      max: 10000,
-      min: 0
-    },
-    {
-      name: 'high',
-      max: 100000,
-      min: 50000
-    },
-    {
-      name: 'any',
-      max: 100000,
-      min: 0
 
+  var filters = document.querySelector('.map__filters');
+  var filterElements = {
+    selects: filters.querySelectorAll('.map__filter'),
+    features: filters.querySelectorAll('input[name="features"]'),
+  };
+
+  var featureWifi = document.querySelector('#filter-wifi');
+  var featureDishwasher = document.querySelector('#filter-dishwasher');
+  var featureParking = document.querySelector('#filter-parking');
+  var featureWasher = document.querySelector('#filter-washer');
+  var featureElevator = document.querySelector('#filter-elevator');
+  var featureConditioner = document.querySelector('#filter-conditioner');
+
+  var housingType = filters.querySelector('#housing-type').value;
+  var housingPrice = filters.querySelector('#housing-price').value;
+  var housingRooms = filters.querySelector('#housing-rooms').value;
+  var housingGuests = filters.querySelector('#housing-guests').value;
+
+  var Prices = {
+    'low': {
+      min: 0,
+      max: 10000
+    },
+    'middle': {
+      min: 10000,
+      max: 50000
+    },
+    'high': 50000
+  };
+
+  var defaultValue = 'any';
+
+  // Фильтр по типу жилья
+  var filterByHousingType = function (it) {
+    return (it.offer.type === housingType) || (housingType === defaultValue);
+  };
+
+  // Фильтр по цене
+  var filterByHousingPrice = function (it) {
+    if (housingPrice === defaultValue) {
+      return true;
     }
-    ];
-    data.forEach(function (item) {
-      prices.forEach(function (element) {
-        if (housingPrice.value === element.name) {
-          if (element.max >= item.offer.price && item.offer.price >= element.min) {
-            filterData.push(item);
-          }
-        }
-      });
-    });
-    return filterData;
+    if (housingPrice === 'high') {
+      return it.offer.price >= Prices[housingPrice];
+    }
+    return it.offer.price >= Prices[housingPrice].min &&
+   it.offer.price < Prices[housingPrice].max;
   };
-  var filterRooms = function (data) {
-    var filterData = [];
-    data.forEach(function (item) {
-      if (+housingRooms.value === item.offer.rooms) {
-        filterData.push(item);
-      } else if (housingRooms.value === 'any') {
-        filterData.push(item);
-      }
-    });
-    return filterData;
-  };
-  var filterGuests = function (data) {
-    var filterData = [];
-    data.forEach(function (item) {
-      if (+housingGuests.value === item.offer.guests) {
-        filterData.push(item);
-      } else if (housingGuests.value === 'any') {
-        filterData.push(item);
-      }
-    });
-    return filterData;
-  };
-  var filterFeatures = function (data) {
-    var filterData = [];
-    var housingFeaturesChecked = document.querySelectorAll('#housing-features input:checked');
-    data.forEach(function (dataItem) {
-      var current = 0;
-      Array.from(housingFeaturesChecked).forEach(function (item) {
-        dataItem.offer.features.forEach(function (element) {
-          if (item.value === element) {
-            current++;
-            if (current === housingFeaturesChecked.length) {
-              filterData.push(dataItem);
-            }
-          }
-        });
-      });
 
-    });
-    if (housingFeaturesChecked.length === 0) {
-      data.forEach(function (dataItem) {
-        filterData.push(dataItem);
+  // Фильтр по количеству комнат
+  var filterByHousingRooms = function (it) {
+    return (it.offer.rooms.toString() === housingRooms) || (housingRooms === defaultValue);
+  };
+
+  // Фильтр по количеству гостей
+  var filterByHousingGuests = function (it) {
+    return (it.offer.guests.toString() === housingGuests) || (housingGuests === defaultValue);
+  };
+
+  // Фильтр удобств
+  var filterByFeature = function (feature, it) {
+    return (!feature.checked) || (it.offer.features.indexOf(feature.value) !== -1);
+  };
+
+  window.filters = {
+    filterPins: function (it) {
+      return filterByHousingType(it) &&
+    filterByHousingPrice(it) &&
+    filterByHousingGuests(it) &&
+    filterByHousingRooms(it) &&
+    filterByFeature(featureWifi, it) &&
+    filterByFeature(featureDishwasher, it) &&
+    filterByFeature(featureParking, it) &&
+    filterByFeature(featureConditioner, it) &&
+    filterByFeature(featureElevator, it) &&
+    filterByFeature(featureWasher, it);
+    },
+
+    HousingMap: {
+      'housing-type': function (value) {
+        housingType = value;
+      },
+      'housing-price': function (value) {
+        housingPrice = value;
+      },
+      'housing-guests': function (value) {
+        housingGuests = value;
+      },
+      'housing-rooms': function (value) {
+        housingRooms = value;
+      }
+    },
+
+    // Сброс фильтра
+    clearFilters: function () {
+      filterElements.selects.forEach(function (select) {
+        select.value = defaultValue;
+      });
+      filterElements.features.forEach(function (feature) {
+        feature.removeAttribute('checked');
       });
     }
-    return filterData;
   };
-  var filterData = function () {
-    var newData = filterType(window.dataLoad.dataLoad);
-    newData = filterPrice(newData);
-    newData = filterRooms(newData);
-    newData = filterGuests(newData);
-    newData = filterFeatures(newData);
-
-    return newData;
-  };
-  var filter = function (element) {
-    element.addEventListener('change', function () {
-      var pinElements = document.querySelectorAll('.pin-open-card');
-
-      Array.from(pinElements).forEach(function (item) {
-        item.parentNode.removeChild(item);
-      });
-      document.querySelector('.map__pins').appendChild(window.pin.createPinsListeners(filterData()));
-
-    });
-  };
-  filter(housingType);
-  filter(housingRooms);
-  filter(housingPrice);
-  filter(housingGuests);
-  Array.from(housingFeatures).forEach(function (item) {
-    filter(item);
-  });
-
 
 })();
