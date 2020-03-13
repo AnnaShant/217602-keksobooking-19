@@ -32,6 +32,44 @@
     'high': 50000
   };
 
+  var filterPrice = function (data) {
+    var filterData = [];
+    var prices = [{
+      name: 'middle',
+      max: 50000,
+      min: 10000
+    },
+    {
+      name: 'low',
+      max: 10000,
+      min: 0
+    },
+    {
+      name: 'high',
+      max: 100000,
+      min: 50000
+    },
+    {
+      name: 'any',
+      max: 100000,
+      min: 0
+
+    }
+    ];
+    data.forEach(function (item) {
+      prices.forEach(function (element) {
+        if (housingPrice.value === element.name) {
+          if (element.max >= item.offer.price && item.offer.price >= element.min) {
+            filterData.push(item);
+          }
+        }
+      });
+    });
+    return filterData;
+  };
+
+  filterPrice();
+
   var defaultValue = 'any';
 
   // Фильтр по типу жилья
