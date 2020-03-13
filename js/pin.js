@@ -6,6 +6,9 @@
     HEIGHT_PIN: 70
   };
 
+  // Максимальное количество меток
+  var MAX_PINS = 5;
+
   var similarPinTemplate = document.querySelector('#pin')
       .content;
 
@@ -15,38 +18,52 @@
 
     element.querySelector('.map__pin').style.left = arr.location.x - PinSizes.WIDTH_PIN / 2 + 'px';
     element.querySelector('.map__pin').style.top = arr.location.y - PinSizes.HEIGHT_PIN + 'px';
-    element.querySelector('img').src = arr.author.avatar.src;
+    element.querySelector('img').src = arr.author.avatar;
     element.querySelector('img').alt = arr.offer.title;
 
     return element;
   };
 
+  // Функция открытия карточки при нажатии по метке на карте
+  var createPinsListeners = function (arr) {
+    var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+
+    mapPins.forEach(function (pin, index) {
+      pin.addEventListener('click', function () {
+        mapPins[index].classList.add('.map__pin--active');
+        window.card.renderCards(arr[index]);
+      });
+    });
+  };
+
   window.pin = {
-    // Функция создания меток на карте (по длине массива advertisments)
+    createPinsListeners: createPinsListeners,
+    // Функция создания меток на карте
     renderPinList: function () {
-      // Элемент куда будут вставлены метки
       var map = document.querySelector('.map');
       window.map = map;
       var elementPin = map.querySelector('.map__pins');
       var fragment = document.createDocumentFragment();
 
-      for (var i = 0; i < window.quarters.length; i++) {
-        fragment.appendChild(pinRendering(window.quarters[i]));
-      }
-
-      elementPin.appendChild(fragment);
+      var onLoad = function (arr) {
+        arr.forEach(function (pin, i) {
+          if (i < MAX_PINS) {
+            fragment.appendChild(pinRendering(pin));
+          }
+        });
+        elementPin.appendChild(fragment);
+        window.pin.createPinsListeners(arr);
+      };
+      window.backend.load(onLoad);
     },
 
-    // Функция открытия карточки при нажатии по метке на карте
-    createPinsListeners: function () {
+    // Удаление меток
+    removePins: function () {
       var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-
-      mapPins.forEach(function (pin, index) {
-        pin.addEventListener('click', function () {
-          mapPins[index].classList.add('.map__pin--active');
-          window.card.renderCards(window.quarters[index]);
-        });
+      mapPins.forEach(function (pin) {
+        pin.remove();
       });
     }
   };
+
 })();

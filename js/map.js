@@ -14,6 +14,11 @@
     // MainPinData.HALF_WIDTH_PIN
   };
 
+  var MainPinAddress = {
+    x: 601,
+    y: 437
+  };
+
   // При ограничении перемещения метки по горизонтали её острый конец должен указывать на крайнюю точку блока
   var MIN_COORD_X = 0 - MainPinData.HALF_WIDTH_PIN;
   var MAX_COORD_X = 1200 - MainPinData.HALF_WIDTH_PIN;
@@ -38,10 +43,17 @@
     }
   };
 
+  var getMainPinAddress = function () {
+    mainPin.style.left = MainPinAddress.x - MainPinData.HALF_WIDTH_PIN + 'px';
+    mainPin.style.top = MainPinAddress.y - MainPinData.HEIGHT_PIN + 'px';
+
+    window.mainForm.querySelector('#address').value = MainPinAddress.x + ', ' + MainPinAddress.y;
+  };
+
   window.map = {
-    mapAds: document.querySelector('.map'),
     // Функция переноса данных координат в поле "адрес"
-    getAddress: getAddress
+    getAddress: getAddress,
+    getMainPinAddress: getMainPinAddress
   };
 
   // Событие при нажатой кнопки мыши над главной меткой:
@@ -53,6 +65,7 @@
       x: evt.clientX,
       y: evt.clientY
     };
+    window.map.startCoords = startCoords;
 
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
@@ -100,8 +113,6 @@
         window.form.getPopupOpen();
         // Отрисовка меток
         window.pin.renderPinList();
-        // Для каждой метки своя карточка объявления
-        window.pin.createPinsListeners();
 
         isPageActive = true;
       }
@@ -119,8 +130,6 @@
           window.form.getPopupOpen();
           // Отрисовка меток
           window.pin.renderPinList();
-          // Для каждой метки своя карточка объявления
-          window.pin.createPinsListeners();
 
           isPageActive = true;
         }

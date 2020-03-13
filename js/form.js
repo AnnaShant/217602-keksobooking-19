@@ -8,34 +8,39 @@
     'palace': 10000
   };
 
+  var isPageActive = false;
+  window.isPageActive = isPageActive;
   var mainForm = document.querySelector('.ad-form');
   window.mainForm = mainForm;
-  var fieldsetForm = mainForm.querySelectorAll('fieldset');
-  var roomsSelect = mainForm.querySelector('#room_number');
-  var capacitySelect = mainForm.querySelector('#capacity');
-  var titleInput = mainForm.querySelector('#title');
-  var priceInput = mainForm.querySelector('#price');
-  var typeInput = mainForm.querySelector('#type');
-  var timeInInput = mainForm.querySelector('#timein');
-  var timeOutInput = mainForm.querySelector('#timeout');
+  var map = document.querySelector('.map');
 
   window.form = {
-  // Добавление/удаление атрибута disabled
+    formFieldset: document.querySelectorAll('fieldset'),
+    titleInput: document.querySelector('#title'),
+    priceInput: document.querySelector('#price'),
+    typeInput: document.querySelector('#type'),
+    timeInInput: document.querySelector('#timein'),
+    timeOutInput: document.querySelector('#timeout'),
+    roomsSelect: document.querySelector('#room_number'),
+    capacitySelect: document.querySelector('#capacity'),
+    descriptionInput: document.querySelector('#description'),
+
+    // Добавление/удаление атрибута disabled
     setDisabledAdd: function () {
-      for (var i = 0; i < fieldsetForm.length; i++) {
-        fieldsetForm[i].disabled = true;
+      for (var i = 0; i < window.form.formFieldset.length; i++) {
+        window.form.formFieldset[i].disabled = true;
       }
     },
 
     setDisabledRemove: function () {
-      for (var j = 0; j < fieldsetForm.length; j++) {
-        fieldsetForm[j].removeAttribute('disabled');
+      for (var j = 0; j < window.form.formFieldset.length; j++) {
+        window.form.formFieldset[j].removeAttribute('disabled');
       }
     },
 
     // Открытие/закрытие попапа
     getPopupOpen: function () {
-      window.map.mapAds.classList.remove('map--faded');
+      map.classList.remove('map--faded');
       mainForm.classList.remove('ad-form--disabled');
       window.form.setDisabledRemove();
     }
@@ -46,7 +51,7 @@
   window.map.getAddress();
 
   // Все элементы option
-  var inputCapacityOptions = capacitySelect.querySelectorAll('option');
+  var inputCapacityOptions = window.form.capacitySelect.querySelectorAll('option');
 
   // Удаление option
   var inputRoomValidateNumber = function () {
@@ -54,7 +59,7 @@
       element.remove();
     });
 
-    switch (roomsSelect.selectedIndex) {
+    switch (window.form.roomsSelect.selectedIndex) {
       case 0:
         insertInputCapacityOptions([2]);
         break;
@@ -70,14 +75,14 @@
     }
   };
 
-  var inputTimeOutOptions = timeOutInput.querySelectorAll('option');
+  var inputTimeOutOptions = window.form.timeOutInput.querySelectorAll('option');
 
   var inputTimeInValidateOptions = function () {
     inputTimeOutOptions.forEach(function (element) {
       element.remove();
     });
 
-    switch (timeInInput.selectedIndex) {
+    switch (window.form.timeInInput.selectedIndex) {
       case 0:
         insertInputTimeInOptions([0]);
         break;
@@ -93,39 +98,39 @@
   // Добавление элементов option
   var insertInputCapacityOptions = function (elements) {
     elements.forEach(function (element) {
-      capacitySelect.appendChild(inputCapacityOptions[element]);
+      window.form.capacitySelect.appendChild(inputCapacityOptions[element]);
     });
   };
   var insertInputTimeInOptions = function (elements) {
     elements.forEach(function (element) {
-      timeOutInput.appendChild(inputTimeOutOptions[element]);
+      window.form.timeOutInput.appendChild(inputTimeOutOptions[element]);
     });
   };
 
   inputRoomValidateNumber();
   inputTimeInValidateOptions();
-  roomsSelect.addEventListener('change', inputRoomValidateNumber);
-  timeInInput.addEventListener('change', inputTimeInValidateOptions);
+  window.form.roomsSelect.addEventListener('change', inputRoomValidateNumber);
+  window.form.timeInInput.addEventListener('change', inputTimeInValidateOptions);
 
   // Валидация заголовка
-  titleInput.addEventListener('invalid', function () {
-    if (titleInput.validity.tooShort) {
-      titleInput.setCustomValidity('Заголовок объявления должен состоять минимум из 30 символов');
-    } else if (titleInput.validity.tooLong) {
-      titleInput.setCustomValidity('Заголовок объявления не должен превышать 100 символов');
-    } else if (titleInput.validity.valueMissing) {
-      titleInput.setCustomValidity('Обязательное поле');
+  window.form.titleInput.addEventListener('invalid', function () {
+    if (window.form.titleInput.validity.tooShort) {
+      window.form.titleInput.setCustomValidity('Заголовок объявления должен состоять минимум из 30 символов');
+    } else if (window.form.titleInput.validity.tooLong) {
+      window.form.titleInput.setCustomValidity('Заголовок объявления не должен превышать 100 символов');
+    } else if (window.form.titleInput.validity.valueMissing) {
+      window.form.titleInput.setCustomValidity('Обязательное поле');
     } else {
-      titleInput.setCustomValidity('');
+      window.form.titleInput.setCustomValidity('');
     }
   });
 
   // Валидация формы стоимости
-  typeInput.addEventListener('change', function (evt) {
+  window.form.typeInput.addEventListener('change', function (evt) {
     var priceValue = MIN_PRICES[evt.target.value];
 
-    priceInput.setAttribute('min', priceValue);
-    priceInput.setAttribute('placeholder', priceValue);
+    window.form.priceInput.setAttribute('min', priceValue);
+    window.form.priceInput.setAttribute('placeholder', priceValue);
   });
-  priceInput.placeholder = MIN_PRICES.flat;
+  window.form.priceInput.placeholder = MIN_PRICES.flat;
 })();
