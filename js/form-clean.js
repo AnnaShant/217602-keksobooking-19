@@ -62,7 +62,8 @@
     elementOnSucces.addEventListener('click', onSuccesClose);
     document.addEventListener('keydown', keydownOnSuccesClose);
     fragment.appendChild(elementOnSucces);
-    window.map.mapElement.appendChild(fragment);
+    var mapElement = document.querySelector('.map');
+    mapElement.appendChild(fragment);
   };
 
   var keydownOnSuccesClose = function (evt) {
