@@ -1,144 +1,161 @@
 'use strict';
-
 (function () {
-
-  var ENTER_KEYCODE = 13;
-
-  // Карта объявлений
-  var mainPin = document.querySelector('.map__pin--main');
-
   var MainPinData = {
-    HALF_WIDTH_PIN: 31, // Изображение метки 62px / 2
-    HEIGHT_PIN: 62,
-    ALL_HEIGHT_PIN: 84 // Изображения метки 62px + хростик метки 22px
-    // MainPinData.HALF_WIDTH_PIN
+    PIN_MAIN_WIDTH: 65,
+    PIN_MAIN_HEIGHT: 84
   };
 
-  var MainPinAddress = {
-    x: 601,
-    y: 437
+  var PIN_WIDTH = 50;
+
+  var MapHeight = {
+    MAP_HEIGHT: 630,
+    MAP_HEADER_HEIGHT: 130
   };
 
-  // При ограничении перемещения метки по горизонтали её острый конец должен указывать на крайнюю точку блока
-  var MIN_COORD_X = 0 - MainPinData.HALF_WIDTH_PIN;
-  var MAX_COORD_X = 1200 - MainPinData.HALF_WIDTH_PIN;
-  var MIN_COORD_Y = 130;
-  var MAX_COORD_Y = 630;
+  var KEYCODE_ENTER = 13;
 
-  var isPageActive = false;
+  var mapElement = document.querySelector('.map');
+  var mapHeaderHeight = MapHeight.MAP_HEADER_HEIGHT;
+  var mapHeight = MapHeight.MAP_HEIGHT;
+  var mapWidth = mapElement.offsetWidth;
+  var inputAddressElement = document.querySelector('#address');
+  var mapPinMainElement = document.querySelector('.map__pin--main');
+  var mapPinsElement = document.querySelector('.map__pins');
+  var data = window.dataLoad.dataLoad;
+  var btnReset = document.querySelector('.ad-form__reset');
+  var form = document.querySelector('.ad-form');
 
-  var getAddress = function () {
-    if (!isPageActive) {
-      var coords = {
-        x: mainPin.offsetLeft + MainPinData.HALF_WIDTH_PIN,
-        y: mainPin.offsetTop + MainPinData.HEIGHT_PIN
-      };
-      window.mainForm.querySelector('#address').value = coords.x + ', ' + coords.y;
-    } else {
-      var newCoords = {
-        x: window.map.coordinates.x + MainPinData.HALF_WIDTH_PIN,
-        y: window.map.coordinates.y + MainPinData.ALL_HEIGHT_PIN
-      };
-      window.mainForm.querySelector('#address').value = newCoords.x + ', ' + newCoords.y;
-    }
+  var getLocation = function () {
+    var locationX = +(mapPinMainElement.style.left).slice(0, -2) + MainPinData.PIN_MAIN_WIDTH / 2;
+    var locationY = +(mapPinMainElement.style.top).slice(0, -2) + MainPinData.PIN_MAIN_HEIGHT;
+
+    return Math.floor(locationX) + ', ' + Math.floor(locationY);
   };
 
-  var getMainPinAddress = function () {
-    mainPin.style.left = MainPinAddress.x - MainPinData.HALF_WIDTH_PIN + 'px';
-    mainPin.style.top = MainPinAddress.y - MainPinData.HEIGHT_PIN + 'px';
-
-    window.mainForm.querySelector('#address').value = MainPinAddress.x + ', ' + MainPinAddress.y;
+  // Активация карты
+  var activateMap = function () {
+    mapPinMainElement.removeEventListener('mouseup', activateMap);
+    mapPinMainElement.removeEventListener('keydown', keydownActivateMap);
+    mapElement.classList.remove('map--faded');
+    form.classList.remove('ad-form--disabled');
+    form.classList.remove('ad-form--disabled');
+    window.validation.initForm(false);
+    mapPinsElement.appendChild(window.pin.createElementPin(data));
+    window.pin.controlPinMap();
+    window.form.createPictures();
   };
 
-  window.map = {
-    // Функция переноса данных координат в поле "адрес"
-    getAddress: getAddress,
-    getMainPinAddress: getMainPinAddress
+  // Возвращение в исходное состояние
+  var inactivateMap = function () {
+    var mapFilters = document.querySelectorAll('.map__filter');
+    var checkboxFilters = document.querySelectorAll('.map__checkbox');
+    var checkboxForm = document.querySelectorAll('.feature__checkbox');
+
+    Array.from(checkboxFilters).forEach(function (item) {
+      item.checked = false;
+    });
+
+    Array.from(checkboxForm).forEach(function (item) {
+      item.checked = false;
+    });
+
+    Array.from(mapFilters).forEach(function (item) {
+      item.value = 'any';
+    });
+
+    // Расположение основной метки по умолчанию
+    window.validation.initForm('disabled');
+    var pinElement = document.querySelectorAll('.pin-open-card');
+    mapElement.classList.add('map--faded');
+    form.classList.add('ad-form--disabled');
+
+    mapPinMainElement.style.left = '570px';
+    mapPinMainElement.style.top = '375px';
+
+    Array.from(pinElement).forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+    var mapCard = document.querySelector('.map__card');
+    mapCard.classList.add('hidden');
   };
 
-  // Событие при нажатой кнопки мыши над главной меткой:
-  mainPin.addEventListener('mousedown', function (evt) {
+  // Перемещение метки
+  mapPinMainElement.addEventListener('mousedown', function (evt) {
+
     evt.preventDefault();
-
-    // Начальные координаты метки
-    var startCoords = {
+    var startCoord = {
       x: evt.clientX,
       y: evt.clientY
     };
-    window.map.startCoords = startCoords;
 
-    var onMouseMove = function (moveEvt) {
-      moveEvt.preventDefault();
+    var dragged = false;
+
+    var onMouseMove = function (evtMove) {
+      evtMove.preventDefault();
+
+      dragged = true;
 
       var shift = {
-        x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
+        x: startCoord.x - evtMove.clientX,
+        y: startCoord.y - evtMove.clientY
       };
 
-      startCoords = {
-        x: moveEvt.clientX,
-        y: moveEvt.clientY
+      startCoord = {
+        x: evtMove.clientX,
+        y: evtMove.clientY
       };
 
-      var coordinates = {
-        x: mainPin.offsetLeft - shift.x,
-        y: mainPin.offsetTop - shift.y
-      };
-      window.map.coordinates = coordinates;
+      var pinY = mapPinMainElement.offsetTop - shift.y;
+      var pinX = mapPinMainElement.offsetLeft - shift.x;
 
-      if (coordinates.x < MIN_COORD_X) {
-        coordinates.x = MIN_COORD_X;
-      } else if (coordinates.x > MAX_COORD_X) {
-        coordinates.x = MAX_COORD_X;
+      if (pinY >= mapHeaderHeight && pinY <= mapHeight &&
+        pinX < mapWidth - PIN_WIDTH && pinX > 0) {
+        mapPinMainElement.style.top = pinY + 'px';
+        mapPinMainElement.style.left = pinX + 'px';
       }
-
-      if (coordinates.y < MIN_COORD_Y) {
-        coordinates.y = MIN_COORD_Y;
-      } else if (coordinates.y > MAX_COORD_Y) {
-        coordinates.y = MAX_COORD_Y;
-      }
-
-      mainPin.style.left = coordinates.x + 'px';
-      mainPin.style.top = coordinates.y + 'px';
-
-      getAddress();
     };
 
-    var onMouseUp = function (upEvt) {
-      upEvt.preventDefault();
-
-      // Показ меток на карте
-      if (!isPageActive) {
-        // Открытие попапа
-        window.form.getPopupOpen();
-        // Отрисовка меток
-        window.pin.renderPinList();
-
-        isPageActive = true;
-      }
-
+    var onMouseUp = function (evtUp) {
+      evtUp.preventDefault();
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
+      inputAddressElement.value = getLocation();
+      if (dragged) {
+        var onPreventDefaultClick = function (evtClick) {
+          evtClick.preventDefault();
+          mapPinMainElement.removeEventListener('click', onPreventDefaultClick);
+        };
+        mapPinMainElement.addEventListener('click', onPreventDefaultClick);
+      }
     };
 
-    // Событие при нажатии на Enter при фокусе над главной меткой
-    mainPin.addEventListener('keydown', function (evtKey) {
-      if (evtKey.keyCode === ENTER_KEYCODE) {
-        // Показ меток на карте
-        if (!isPageActive) {
-          // Открытие попапа
-          window.form.getPopupOpen();
-          // Отрисовка меток
-          window.pin.renderPinList();
-
-          isPageActive = true;
-        }
-      }
-    });
-
-    // Обработчики события передвижения мыши и отпускания кнопки мыши
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
 
+  // Активация карты по ENTER
+  var keydownActivateMap = function (evt) {
+    if (evt.keyCode === KEYCODE_ENTER) {
+      activateMap();
+    }
+  };
+
+  mapPinMainElement.addEventListener('mouseup', activateMap);
+  mapPinMainElement.addEventListener('keydown', keydownActivateMap);
+  btnReset.addEventListener('click', function () {
+    window.form.inputClean();
+    inactivateMap();
+    mapPinMainElement.addEventListener('mouseup', activateMap);
+    mapPinMainElement.addEventListener('keydown', keydownActivateMap);
+
+  });
+
+  window.map = {
+    getLocation: getLocation,
+    inputAddressElement: inputAddressElement,
+    mapPinMainElement: mapPinMainElement,
+    inactivateMap: inactivateMap,
+    activateMap: activateMap,
+    keydownActivateMap: keydownActivateMap
+  };
 })();

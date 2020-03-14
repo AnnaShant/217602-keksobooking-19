@@ -1,69 +1,100 @@
 'use strict';
-
 (function () {
   var PinSizes = {
     WIDTH_PIN: 50,
     HEIGHT_PIN: 70
   };
 
-  // Максимальное количество меток
   var MAX_PINS = 5;
+  var KEYCODE_ENTER = 13;
+  var KEYCODE_ESC = 27;
 
-  var similarPinTemplate = document.querySelector('#pin')
-      .content;
+  var pinTemplateElement = document.querySelector('#pin').content;
+  var pinElement = pinTemplateElement.querySelector('.map__pin');
 
-  // Функция отрисовки метки
-  var pinRendering = function (arr) {
-    var element = similarPinTemplate.cloneNode(true);
+  // Создание меток на карте
+  var createElementPin = function (arr) {
+    var fragment = document.createDocumentFragment();
+    var elements = [];
 
-    element.querySelector('.map__pin').style.left = arr.location.x - PinSizes.WIDTH_PIN / 2 + 'px';
-    element.querySelector('.map__pin').style.top = arr.location.y - PinSizes.HEIGHT_PIN + 'px';
-    element.querySelector('img').src = arr.author.avatar;
-    element.querySelector('img').alt = arr.offer.title;
+    for (var j = 0; j < arr.length; j++) {
+      var element = pinElement.cloneNode(true);
+      element.classList.add('pin-open-card');
+      var imgElement = element.querySelector('img');
 
-    return element;
+      element.setAttribute('data-id', arr[j].id);
+      element.style.left = arr[j].location.x - PinSizes.WIDTH_PIN / 2 + 'px';
+      element.style.top = arr[j].location.y - PinSizes.HEIGHT_PIN + 'px';
+      imgElement.src = arr[j].author.avatar;
+      imgElement.alt = arr[j].offer.title;
+
+      if (arr.length > MAX_PINS) {
+        if (elements.length < MAX_PINS) {
+          elements.push(element);
+        }
+      } else {
+        elements.push(element);
+      }
+    }
+    elements.forEach(function (item) {
+      fragment.appendChild(item);
+    });
+
+    return fragment;
   };
 
-  // Функция открытия карточки при нажатии по метке на карте
-  var createPinsListeners = function (arr) {
-    var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+  // Открытие/закрытие карточки метки
+  var controlPinMap = function () {
+    var mapCard = document.querySelector('.map__card');
+    var pinElements = document.querySelectorAll('.pin-open-card');
+    var data = window.dataLoad.dataLoad;
 
-    mapPins.forEach(function (pin, index) {
-      pin.addEventListener('click', function () {
-        mapPins[index].classList.add('.map__pin--active');
-        window.card.renderCards(arr[index]);
+    var onOpenCardClick = function (i, item) {
+      Array.from(pinElements).forEach(function (element) {
+        element.classList.remove('map__pin--active');
+      });
+
+      window.card.createElementCard(data, i);
+      item.classList.add('map__pin--active');
+      mapCard.classList.remove('hidden');
+      mapCard.querySelector('.popup__close').addEventListener('click', function () {
+        onCloseCardClick(item);
+      });
+
+      document.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === KEYCODE_ESC) {
+          onCloseCardClick(item);
+        }
+      });
+    };
+
+    var onCloseCardClick = function (item) {
+      item.classList.remove('map__pin--active');
+      document.removeEventListener('keydown', onCloseCardClick);
+      mapCard.classList.add('hidden');
+    };
+
+    Array.from(pinElements).forEach(function (item) {
+      item.addEventListener('click', function () {
+        onOpenCardClick(item.getAttribute('data-id'), item);
+        document.addEventListener('keydown', function (evt) {
+          if (evt.keyCode === KEYCODE_ESC) {
+            onCloseCardClick(item);
+          }
+        });
+      });
+
+      item.addEventListener('keydown', function (evt) {
+        if (evt.keyCode === KEYCODE_ENTER) {
+          onOpenCardClick(item.getAttribute('data-id'), item);
+        }
       });
     });
+
   };
 
   window.pin = {
-    createPinsListeners: createPinsListeners,
-    // Функция создания меток на карте
-    renderPinList: function () {
-      var map = document.querySelector('.map');
-      window.map = map;
-      var elementPin = map.querySelector('.map__pins');
-      var fragment = document.createDocumentFragment();
-
-      var onLoad = function (arr) {
-        arr.forEach(function (pin, i) {
-          if (i < MAX_PINS) {
-            fragment.appendChild(pinRendering(pin));
-          }
-        });
-        elementPin.appendChild(fragment);
-        window.pin.createPinsListeners(arr);
-      };
-      window.backend.load(onLoad);
-    },
-
-    // Удаление меток
-    removePins: function () {
-      var mapPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-      mapPins.forEach(function (pin) {
-        pin.remove();
-      });
-    }
+    controlPinMap: controlPinMap,
+    createElementPin: createElementPin
   };
-
 })();
