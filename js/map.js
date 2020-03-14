@@ -12,9 +12,10 @@
 
   var PIN_WIDTH = 50;
 
+  var mapElement = document.querySelector('.map');
   var mapHeaderHeight = MapHeight.MAP_HEADER_HEIGHT;
   var mapHeight = MapHeight.MAP_HEIGHT;
-  var mapWidth = window.map.mapElement.offsetWidth;
+  var mapWidth = mapElement.offsetWidth;
   var inputAddressElement = document.querySelector('#address');
   var mapPinMainElement = document.querySelector('.map__pin--main');
   var mapPinsElement = document.querySelector('.map__pins');
@@ -62,7 +63,7 @@
     // Расположение основной метки по умолчанию
     window.validation.initForm('disabled');
     var pinElement = document.querySelectorAll('.pin-open-card');
-    window.map.mapElement.classList.add('map--faded');
+    mapElement.classList.add('map--faded');
     window.form.form.classList.add('ad-form--disabled');
 
     mapPinMainElement.style.left = '570px';

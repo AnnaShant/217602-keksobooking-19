@@ -7,6 +7,8 @@
   var pictureContainer = document.querySelector('.ad-form__photo');
   var blockPhoto = document.querySelector('.ad-form__photo-container');
   var fragment = document.createDocumentFragment();
+  var form = document.querySelector('.ad-form');
+  var mapPinMainElement = document.querySelector('.map__pin--main');
 
   // Очистка формы после отправки объявления
   var inputClean = function () {
@@ -31,7 +33,7 @@
     });
   };
 
-  window.form.form.addEventListener('submit', function (evt) {
+  form.addEventListener('submit', function (evt) {
     var inValidForm = true;
     evt.preventDefault();
 
@@ -72,8 +74,8 @@
   var onSuccesClose = function () {
     document.removeEventListener('keydown', keydownOnSuccesClose);
     document.querySelector('.success-close').parentNode.removeChild(document.querySelector('.success-close'));
-    window.map.mapPinMainElement.addEventListener('mouseup', window.map.activateMap);
-    window.map.mapPinMainElement.addEventListener('keydown', window.map.keydownActivateMap);
+    mapPinMainElement.addEventListener('mouseup', window.map.activateMap);
+    mapPinMainElement.addEventListener('keydown', window.map.keydownActivateMap);
   };
 
   // Добавление изображений в карточку объявления
