@@ -43,6 +43,7 @@
 
   // Открытие/закрытие карточки метки
   var controlPinMap = function () {
+    var card = document.querySelector('.map__card');
     var pinElements = document.querySelectorAll('.pin-open-card');
     var data = window.dataLoad.dataLoad;
 
@@ -53,8 +54,8 @@
 
       window.card.createElementCard(data, i);
       item.classList.add('map__pin--active');
-      window.card.mapCard.classList.remove('hidden');
-      window.card.mapCard.querySelector('.popup__close').addEventListener('click', function () {
+      card.classList.remove('hidden');
+      card.querySelector('.popup__close').addEventListener('click', function () {
         onCloseCardClick(item);
       });
 
@@ -68,7 +69,7 @@
     var onCloseCardClick = function (item) {
       item.classList.remove('map__pin--active');
       document.removeEventListener('keydown', onCloseCardClick);
-      window.card.mapCard.classList.add('hidden');
+      card.classList.add('hidden');
     };
 
     Array.from(pinElements).forEach(function (item) {
