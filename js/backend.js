@@ -6,7 +6,6 @@
   };
 
   var CODE_SUCCESS = 200;
-  var KEYCODE_ESC = 27;
 
   var mapElement = document.querySelector('.map');
 
@@ -45,7 +44,7 @@
     document.addEventListener('click', onErrorClose);
 
     errorBlock.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === KEYCODE_ESC) {
+      if (evt.keyCode === window.backend.escCode) {
         onErrorClose();
       }
     });
@@ -69,6 +68,8 @@
       xhr.send();
     },
 
-    loadError: loadError
+    loadError: loadError,
+
+    escCode: 27
   };
 })();

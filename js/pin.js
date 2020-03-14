@@ -6,8 +6,6 @@
   };
 
   var MAX_PINS = 5;
-  var KEYCODE_ENTER = 13;
-  var KEYCODE_ESC = 27;
 
   var pinTemplateElement = document.querySelector('#pin').content;
   var pinElement = pinTemplateElement.querySelector('.map__pin');
@@ -45,7 +43,6 @@
 
   // Открытие/закрытие карточки метки
   var controlPinMap = function () {
-    var mapCard = document.querySelector('.map__card');
     var pinElements = document.querySelectorAll('.pin-open-card');
     var data = window.dataLoad.dataLoad;
 
@@ -56,13 +53,13 @@
 
       window.card.createElementCard(data, i);
       item.classList.add('map__pin--active');
-      mapCard.classList.remove('hidden');
-      mapCard.querySelector('.popup__close').addEventListener('click', function () {
+      window.card.mapCard.classList.remove('hidden');
+      window.card.mapCard.querySelector('.popup__close').addEventListener('click', function () {
         onCloseCardClick(item);
       });
 
       document.addEventListener('keydown', function (evt) {
-        if (evt.keyCode === KEYCODE_ESC) {
+        if (evt.keyCode === window.backend.escCode) {
           onCloseCardClick(item);
         }
       });
@@ -71,26 +68,25 @@
     var onCloseCardClick = function (item) {
       item.classList.remove('map__pin--active');
       document.removeEventListener('keydown', onCloseCardClick);
-      mapCard.classList.add('hidden');
+      window.card.mapCard.classList.add('hidden');
     };
 
     Array.from(pinElements).forEach(function (item) {
       item.addEventListener('click', function () {
         onOpenCardClick(item.getAttribute('data-id'), item);
         document.addEventListener('keydown', function (evt) {
-          if (evt.keyCode === KEYCODE_ESC) {
+          if (evt.keyCode === window.backend.escCode) {
             onCloseCardClick(item);
           }
         });
       });
 
       item.addEventListener('keydown', function (evt) {
-        if (evt.keyCode === KEYCODE_ENTER) {
+        if (evt.keyCode === window.map.enterCode) {
           onOpenCardClick(item.getAttribute('data-id'), item);
         }
       });
     });
-
   };
 
   window.pin = {

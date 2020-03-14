@@ -5,25 +5,21 @@
     PIN_MAIN_HEIGHT: 84
   };
 
-  var PIN_WIDTH = 50;
-
   var MapHeight = {
     MAP_HEIGHT: 630,
     MAP_HEADER_HEIGHT: 130
   };
 
-  var KEYCODE_ENTER = 13;
+  var PIN_WIDTH = 50;
 
-  var mapElement = document.querySelector('.map');
   var mapHeaderHeight = MapHeight.MAP_HEADER_HEIGHT;
   var mapHeight = MapHeight.MAP_HEIGHT;
-  var mapWidth = mapElement.offsetWidth;
+  var mapWidth = window.map.mapElement.offsetWidth;
   var inputAddressElement = document.querySelector('#address');
   var mapPinMainElement = document.querySelector('.map__pin--main');
   var mapPinsElement = document.querySelector('.map__pins');
   var data = window.dataLoad.dataLoad;
   var btnReset = document.querySelector('.ad-form__reset');
-  var form = document.querySelector('.ad-form');
 
   var getLocation = function () {
     var locationX = +(mapPinMainElement.style.left).slice(0, -2) + MainPinData.PIN_MAIN_WIDTH / 2;
@@ -36,9 +32,9 @@
   var activateMap = function () {
     mapPinMainElement.removeEventListener('mouseup', activateMap);
     mapPinMainElement.removeEventListener('keydown', keydownActivateMap);
-    mapElement.classList.remove('map--faded');
-    form.classList.remove('ad-form--disabled');
-    form.classList.remove('ad-form--disabled');
+    window.map.mapElement.classList.remove('map--faded');
+    window.form.form.classList.remove('ad-form--disabled');
+    window.form.form.classList.remove('ad-form--disabled');
     window.validation.initForm(false);
     mapPinsElement.appendChild(window.pin.createElementPin(data));
     window.pin.controlPinMap();
@@ -66,8 +62,8 @@
     // Расположение основной метки по умолчанию
     window.validation.initForm('disabled');
     var pinElement = document.querySelectorAll('.pin-open-card');
-    mapElement.classList.add('map--faded');
-    form.classList.add('ad-form--disabled');
+    window.map.mapElement.classList.add('map--faded');
+    window.form.form.classList.add('ad-form--disabled');
 
     mapPinMainElement.style.left = '570px';
     mapPinMainElement.style.top = '375px';
@@ -135,7 +131,7 @@
 
   // Активация карты по ENTER
   var keydownActivateMap = function (evt) {
-    if (evt.keyCode === KEYCODE_ENTER) {
+    if (evt.keyCode === window.map.enterCode) {
       activateMap();
     }
   };
@@ -152,10 +148,10 @@
 
   window.map = {
     getLocation: getLocation,
-    inputAddressElement: inputAddressElement,
-    mapPinMainElement: mapPinMainElement,
     inactivateMap: inactivateMap,
     activateMap: activateMap,
-    keydownActivateMap: keydownActivateMap
+    keydownActivateMap: keydownActivateMap,
+    enterCode: 13,
+    mapElement: document.querySelector('.map')
   };
 })();
