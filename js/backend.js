@@ -1,13 +1,14 @@
 'use strict';
-
 (function () {
-
   var Url = {
     DOWNLOAD: 'https://js.dump.academy/keksobooking/data',
     UPLOAD: 'https://js.dump.academy/keksobooking'
   };
 
   var CODE_SUCCESS = 200;
+  var KEYCODE_ESC = 27;
+
+  var mapElement = document.querySelector('.map');
 
   var xhrSetup = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
@@ -18,6 +19,7 @@
         onLoad(xhr.response);
       } else {
         onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
+        window.backend.loadError();
       }
     });
 
@@ -26,6 +28,30 @@
     });
 
     return xhr;
+  };
+
+  var fragment = document.createDocumentFragment();
+  var loadError = function () {
+    var errorBlock = document.querySelector('#error').content.querySelector('.error');
+    errorBlock.cloneNode(true);
+    var errorButton = errorBlock.querySelector('.error__button');
+
+    var onErrorClose = function () {
+      errorBlock.parentNode.removeChild(errorBlock);
+      document.removeEventListener('click', onErrorClose);
+    };
+
+    errorButton.addEventListener('click', onErrorClose);
+    document.addEventListener('click', onErrorClose);
+
+    errorBlock.addEventListener('keydown', function (evt) {
+      if (evt.keyCode === KEYCODE_ESC) {
+        onErrorClose();
+      }
+    });
+
+    fragment.appendChild(errorBlock);
+    mapElement.appendChild(fragment);
   };
 
   window.backend = {
@@ -41,7 +67,8 @@
 
       xhr.open('GET', Url.DOWNLOAD);
       xhr.send();
-    }
-  };
+    },
 
+    loadError: loadError
+  };
 })();
