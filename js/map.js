@@ -21,6 +21,7 @@
   var mapPinsElement = document.querySelector('.map__pins');
   var data = window.dataLoad.dataLoad;
   var btnReset = document.querySelector('.ad-form__reset');
+  var form = document.querySelector('.ad-form');
 
   var getLocation = function () {
     var locationX = +(mapPinMainElement.style.left).slice(0, -2) + MainPinData.PIN_MAIN_WIDTH / 2;
@@ -60,26 +61,28 @@
       item.value = 'any';
     });
 
-    // Расположение основной метки по умолчанию
     window.validation.initForm('disabled');
     var pinElement = document.querySelectorAll('.pin-open-card');
     mapElement.classList.add('map--faded');
-    window.form.form.classList.add('ad-form--disabled');
+    form.classList.add('ad-form--disabled');
 
-    mapPinMainElement.style.left = '570px';
+    inputAddressElement.value = mapPinMainElement.style.left = '570px';
     mapPinMainElement.style.top = '375px';
+    document.addEventListener('mousemove', function (ev) {
+      ev.preventDefault();
+      inputAddressElement.value = ev.clientX + ' : ' + ev.clientY;
+    });
 
     Array.from(pinElement).forEach(function (item) {
       item.parentNode.removeChild(item);
     });
-    var mapCard = document.querySelector('.map__card');
-    mapCard.classList.add('hidden');
+
   };
 
   // Перемещение метки
   mapPinMainElement.addEventListener('mousedown', function (evt) {
-
     evt.preventDefault();
+
     var startCoord = {
       x: evt.clientX,
       y: evt.clientY
