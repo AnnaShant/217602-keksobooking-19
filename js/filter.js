@@ -5,7 +5,6 @@
   var housingRooms = document.querySelector('#housing-rooms');
   var housingGuests = document.querySelector('#housing-guests');
   var housingFeatures = document.querySelectorAll('#housing-features input');
-  var mapCard = document.querySelector('.map__card');
 
   // По наименованию
   var filterType = function (data) {
@@ -127,7 +126,7 @@
   var filter = function (element) {
     element.addEventListener('change', function () {
       var pinElements = document.querySelectorAll('.pin-open-card');
-      mapCard.classList.add('hidden');
+      window.card.mapCard.classList.add('hidden');
 
       Array.from(pinElements).forEach(function (item) {
         item.parentNode.removeChild(item);
