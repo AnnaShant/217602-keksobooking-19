@@ -66,16 +66,8 @@
     }
   };
 
-  // Закрытие модального окна объявления по ESC
   var onKeyEsc = function (evt) {
     if (evt.keyCode === window.backend.ESC_KEYCODE) {
-      window.card.closeCard();
-    }
-  };
-
-  // Закрытие модального окна объявления по ENTER
-  var onKeyEnter = function (evt) {
-    if (evt.keyCode === window.backend.ENTER_KEYCODE) {
       window.card.closeCard();
     }
   };
@@ -84,7 +76,6 @@
     translateType: translateType,
     createElementCard: createElementCard,
     onKeyEsc: onKeyEsc,
-    onKeyEnter: onKeyEnter,
     closeCard: closeCard
   };
 
