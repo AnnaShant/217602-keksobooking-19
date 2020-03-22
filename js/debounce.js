@@ -1,19 +1,19 @@
 'use strict';
-(function () {
-  var dataLoad = [];
-  var onSuccess = function (data) {
-    data.forEach(function (item, i) {
-      if (item.offer) {
-        item.id = i;
-        item.name = i;
-        dataLoad.push(item);
-      }
-    });
-    return dataLoad;
-  };
-  window.backend.load(onSuccess);
 
-  window.dataLoad = {
-    dataLoad: dataLoad
+(function () {
+  var DEBOUNCE_INTERVAL = 500;
+
+  window.debounce = function (cb) {
+    var lastTimeout = null;
+
+    return function () {
+      var parameters = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        cb.apply(null, parameters);
+      }, DEBOUNCE_INTERVAL);
+    };
   };
 })();
